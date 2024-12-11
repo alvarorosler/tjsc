@@ -4,10 +4,19 @@ import numpy as np
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.seasonal import seasonal_decompose
 import plotly.graph_objects as go
-import locale
 
-# Configuração do locale para português
-locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')  # Configuração de meses em português
+# Tabela de tradução dos meses
+month_translation = {
+    "January": "Janeiro", "February": "Fevereiro", "March": "Março",
+    "April": "Abril", "May": "Maio", "June": "Junho",
+    "July": "Julho", "August": "Agosto", "September": "Setembro",
+    "October": "Outubro", "November": "Novembro", "December": "Dezembro"
+}
+
+# Função para traduzir meses
+def translate_month(date):
+    month = date.strftime('%B')  # Nome do mês em inglês
+    return month_translation.get(month, month) + date.strftime(' de %Y')
 
 # Criação do DataFrame com dados simulados
 data = {
