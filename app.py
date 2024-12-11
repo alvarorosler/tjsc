@@ -67,9 +67,9 @@ def sarimax_model(endog, exog=None, steps=12):
 # Função para decomposição de séries temporais
 def decompose_series(series):
     decomposition = seasonal_decompose(series, model='additive', period=12)
-    decomposition.trend = decomposition.trend.interpolate(method='linear')
-    decomposition.trend = decomposition.trend.reindex(series.index)
-    return decomposition
+    trend = decomposition.trend.interpolate(method='linear')  # Interpolação da tendência
+    seasonal = decomposition.seasonal
+    return trend, seasonal
 
 # Funções para gráficos
 
@@ -80,11 +80,18 @@ def plot_series(actual, predicted, index, title):
     fig.update_layout(title=title, xaxis_title='Data', yaxis_title='Valor', legend_title='Séries')
     st.plotly_chart(fig)
 
-def plot_decomposition(decomposition, title):
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=decomposition.trend.index, y=decomposition.trend, mode='lines', name='Tendência'))
-    fig.update_layout(title=title, xaxis_title='Data', yaxis_title='Tendência')
-    st.plotly_chart(fig)
+def plot_decomposition(trend, seasonal, series_index):
+    # Gráfico da Tendência
+    fig_trend = go.Figure()
+    fig_trend.add_trace(go.Scatter(x=series_index, y=trend, mode='lines', name='Tendência'))
+    fig_trend.update_layout(title='Tendência', xaxis_title='Data', yaxis_title='Valor')
+    st.plotly_chart(fig_trend)
+
+    # Gráfico da Sazonalidade
+    fig_seasonal = go.Figure()
+    fig_seasonal.add_trace(go.Scatter(x=series_index, y=seasonal, mode='lines', name='Sazonalidade'))
+    fig_seasonal.update_layout(title='Sazonalidade', xaxis_title='Data', yaxis_title='Valor')
+    st.plotly_chart(fig_seasonal)
 
 # Interface do Streamlit
 st.markdown("<h1 style='text-align: center;'>NEAD WebApp - Antecipação de Cenários Futuros</h1>", unsafe_allow_html=True)
@@ -111,11 +118,11 @@ else:
 model_fit, forecast_values, forecast_index = sarimax_model(endog, exog, steps)
 
 # Decomposição da série temporal
-decomposition = decompose_series(endog)
+trend, seasonal = decompose_series(endog)
 
-# Gráfico da Tendência
-st.subheader('Componente de Tendência')
-plot_decomposition(decomposition, 'Tendência')
+# Gráficos da decomposição
+st.subheader('Componentes da Série Temporal')
+plot_decomposition(trend, seasonal, endog.index)
 
 # Gráfico da série temporal com predições
 st.subheader(f'Série Temporal e Valores Preditores - {option}')
@@ -129,7 +136,7 @@ last_year_values = endog.shift(12).reindex(forecast_index)
 
 # Resultados da predição
 results = pd.DataFrame({
-    'Mês e Ano': forecast_index.strftime('%B de %Y'),
+    'Mês e Ano': [translate_month(d) for d in forecast_index],
     'Valor Predito': forecast_values,
     'Último Valor Observado Previamente': last_year_values.values,
     'Variação (%)': (forecast_values - last_year_values.values) / last_year_values.values * 100
