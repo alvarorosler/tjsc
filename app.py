@@ -170,13 +170,13 @@ st.write('Tabela de Predições:')
 st.dataframe(results)
 
 # Exibir uma tabela estática
-st.subheader('Resumo Estático de Predições - Novembro de 2024')
+st.write('Verificação da predição em ciclo mensal anterior')
 static_data = {
-    'Métrica': ['Julgamentos', 'Casos Novos', 'Acervo Líquido'],
-    'Observado Nov/2024': ['23.244', '22.262', '74.670'],
-    'Predito Nov/2024': ['23.813', '20.544', '73.986'],
-    'Dif. Abs.': ['-569', '1.718', '684'],
-    'Dif. %': ['2,4%', '-7,7%', '-0,9%']
+    'Métricas de Produção': ['Julgamentos', 'Casos Novos', 'Acervo Líquido'],
+    'Observado - Novembro de 2024': ['23.244', '22.262', '74.670'],
+    'Predito - Novembro de 2024': ['23.813', '20.544', '73.986'],
+    'Diferença absoluta': ['-569', '1.718', '684'],
+    'Diferença relativa(%)': ['2,4%', '-7,7%', '-0,9%']
 }
 static_df = pd.DataFrame(static_data)
 st.table(static_df)
